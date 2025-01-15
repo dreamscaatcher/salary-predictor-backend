@@ -1,22 +1,23 @@
+# Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
 
-# Install Python packages
-RUN pip install --no-cache-dir fastapi uvicorn scikit-learn pandas numpy pydantic joblib
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application
-COPY ./app /app/app
-COPY ./model /app/model
-COPY ./data /app/data
+# Copy the rest of the application
+COPY . .
 
-# Expose the port
+# Run the training script to generate the model
+RUN python model/train.py
+
+# Make port 8000 available to the world outside this container
 EXPOSE 8000
 
-# Command to run the application
+# Run the API server
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -6,8 +6,15 @@ from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 from sklearn.metrics import mean_squared_error, r2_score
 import joblib
 
+import os
+
+# Get absolute paths
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_PATH = os.path.join(BASE_DIR, 'data', 'ds_salaries.csv')
+MODEL_PATH = os.path.join(BASE_DIR, 'model', 'lin_regress.sav')
+
 # Load data
-salary_data = pd.read_csv('data/ds_salaries.csv')
+salary_data = pd.read_csv(DATA_PATH)
 
 # Keep only relevant columns
 salary_data = salary_data[['experience_level', 'company_size', 'employment_type', 'job_title', 'salary_in_usd']]
@@ -59,4 +66,5 @@ print("Mean squared error: %.2f" % mean_squared_error(y_test, y_pred))
 print("R2 score: %.2f" % r2_score(y_test, y_pred))
 
 # Save model
-joblib.dump(regr, 'model/lin_regress.sav')
+joblib.dump(regr, MODEL_PATH)
+print(f"Model saved to {MODEL_PATH}")
