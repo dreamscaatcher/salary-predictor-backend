@@ -31,5 +31,7 @@ def predict_salary(features: PredictionFeatures):
     # Load model and make prediction
     model = load_model()
     prediction = model.predict(input_data)[0]
+    rounded_prediction = round(prediction, 2)
     
-    return round(prediction, 2)  # Round to 2 decimal places
+    print(f"Debug: Made prediction: {rounded_prediction}")  # Add debug logging
+    return rounded_prediction
