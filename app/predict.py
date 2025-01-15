@@ -13,25 +13,37 @@ class PredictionFeatures(BaseModel):
     job_title_Machine_Learning_Engineer: int  # 0 or 1
 
 def load_model():
-    model_path = os.path.join(os.path.dirname(__file__), '..', 'model', 'lin_regress.sav')
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    model_path = os.path.join(BASE_DIR, 'model', 'lin_regress.sav')
     return joblib.load(model_path)
 
 def predict_salary(features: PredictionFeatures):
-    # Convert features to DataFrame
-    input_data = pd.DataFrame([{
-        "experience_level_encoded": features.experience_level_encoded,
-        "company_size_encoded": features.company_size_encoded,
-        "employment_type_PT": features.employment_type_PT,
-        "job_title_Data_Engineer": features.job_title_Data_Engineer,
-        "job_title_Data_Manager": features.job_title_Data_Manager,
-        "job_title_Data_Scientist": features.job_title_Data_Scientist,
-        "job_title_Machine_Learning_Engineer": features.job_title_Machine_Learning_Engineer
-    }])
-    
-    # Load model and make prediction
-    model = load_model()
-    prediction = model.predict(input_data)[0]
-    rounded_prediction = round(prediction, 2)
-    
-    print(f"Debug: Made prediction: {rounded_prediction}")  # Add debug logging
-    return rounded_prediction
+    try:
+        print(f"Debug: Received features: {features}")
+        
+        # Convert features to DataFrame
+        input_data = pd.DataFrame([{
+            "experience_level_encoded": features.experience_level_encoded,
+            "company_size_encoded": features.company_size_encoded,
+            "employment_type_PT": features.employment_type_PT,
+            "job_title_Data_Engineer": features.job_title_Data_Engineer,
+            "job_title_Data_Manager": features.job_title_Data_Manager,
+            "job_title_Data_Scientist": features.job_title_Data_Scientist,
+            "job_title_Machine_Learning_Engineer": features.job_title_Machine_Learning_Engineer
+        }])
+        
+        print(f"Debug: Input DataFrame:\n{input_data}")
+        
+        # Load model and make prediction
+        model = load_model()
+        print("Debug: Model loaded successfully")
+        
+        prediction = model.predict(input_data)[0]
+        rounded_prediction = round(prediction, 2)
+        
+        print(f"Debug: Made prediction: {rounded_prediction}")
+        return rounded_prediction
+        
+    except Exception as e:
+        print(f"Error in predict_salary: {str(e)}")
+        raise Exception(f"Prediction failed: {str(e)}")

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from app.predict import PredictionFeatures, predict_salary
@@ -20,8 +20,17 @@ async def root():
 
 @app.post("/predict")
 async def predict(features: PredictionFeatures):
-    prediction = predict_salary(features)
-    return {"predicted_salary_usd": prediction}
+    try:
+        print(f"Received prediction request with features: {features}")
+        prediction = predict_salary(features)
+        print(f"Successfully generated prediction: {prediction}")
+        return {"predicted_salary_usd": prediction}
+    except Exception as e:
+        print(f"Error processing prediction request: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate prediction: {str(e)}"
+        )
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
